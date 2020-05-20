@@ -4,7 +4,7 @@ displayName: Cocoapods Install
 description: "Execute CocoaPods install in the project path."
 inputs:
 - key: "AC_PROJECT_PATH"
-  defaultValue: "$AC_PROJECT"
+  defaultValue: "$AC_PROJECT_PATH"
   isRequired: true
   title: Project Path
   description: "Specifies the project path. For example : ./appcircle.xcodeproj"
