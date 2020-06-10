@@ -35,12 +35,16 @@ def runCommand(command)
       stdout.each_line do |line|
         puts line
       end
+      stderr.each_line do |line|
+        puts line
+      end
       stdout_str = stdout.read
       stderr_str = stderr.read
       status = wait_thr.value
     end
   
     unless status.success?
+      puts "Error: #{stderr_str}"
       raise stderr_str
     end
 end
