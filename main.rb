@@ -28,24 +28,8 @@ end
 
 def runCommand(command)
     puts "@[command] #{command}"
-    status = nil
-    stdout_str = nil
-    stderr_str = nil
-    Open3.popen3(command) do |stdin, stdout, stderr, wait_thr|
-      stdout.each_line do |line|
-        puts line
-      end
-      stderr.each_line do |line|
-        puts line
-      end
-      stdout_str = stdout.read
-      stderr_str = stderr.read
-      status = wait_thr.value
-    end
-  
-    unless status.success?
-      puts "Error: #{stderr_str}"
-      raise stderr_str
+    unless system(command)
+      exit $?.exitstatus
     end
 end
 
@@ -63,8 +47,12 @@ else
     runCommand("sudo gem install cocoapods -v #{cocoapods_version} --no-document")
 end
 
-if cocoapods_version.nil?
+unless cocoapods_version.nil?
+  runCommand("pod _#{cocoapods_version}_ setup")
+  runCommand("pod _#{cocoapods_version}_ repo update")
+else
   runCommand("pod --version")
+  runCommand("pod repo update")
 end
 
 Dir.chdir(project_dir_path) do
@@ -73,12 +61,7 @@ Dir.chdir(project_dir_path) do
       command += " _#{cocoapods_version}_"
     end
     command += " install"
-    command += " --repo-update"
     runCommand(command)
 end
 
 exit 0
-
-
-
-
