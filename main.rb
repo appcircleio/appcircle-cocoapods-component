@@ -27,7 +27,7 @@ end
 # end
 
 def runCommand(command)
-    puts "@[command] #{command}"
+    puts "@@[command] #{command}"
     unless system(command)
       exit $?.exitstatus
     end
