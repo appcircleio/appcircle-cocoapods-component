@@ -39,12 +39,20 @@ if cocoapods_version.nil?
     if versionArray && versionArray[0]
       cocoapods_version = versionArray[0]
       puts "Podfile.lock version = #{cocoapods_version}"
-      runCommand("sudo gem install cocoapods -v #{cocoapods_version} --no-document")
+      if `which rbenv`.empty?
+        runCommand("sudo gem install cocoapods -v #{cocoapods_version} --no-document")
+      else
+        runCommand("gem install cocoapods -v #{cocoapods_version} --no-document")
+      end
     end
   end
 else
   puts "Cocoapods version = #{cocoapods_version}"
+  if `which rbenv`.empty?
     runCommand("sudo gem install cocoapods -v #{cocoapods_version} --no-document")
+  else
+    runCommand("gem install cocoapods -v #{cocoapods_version} --no-document")
+  end
 end
 
 unless cocoapods_version.nil?
