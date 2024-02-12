@@ -27,7 +27,7 @@ if File.extname(project_path) != ".xcworkspace"
     exit 0
 end
 
-if pod_exist
+if pod_file_exist
   if File.exist?(cocoapods_project_path)
       puts "Pods already installed."
       exit 0
