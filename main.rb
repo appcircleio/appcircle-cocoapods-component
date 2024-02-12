@@ -1,15 +1,21 @@
 require 'open3'
 require 'pathname'
 
+def env_has_key(key)
+  return (ENV[key] != nil && ENV[key] !="") ? ENV[key] : abort("Missing #{key}.")
+end
+
 project_path = ENV["AC_PROJECT_PATH"] || abort('Missing project path.')
 repository_path = ENV["AC_REPOSITORY_DIR"]
+pod_file_exist = env_has_key('AC_PODFILE_EXIST')
+pod_repo_update = env_has_key('AC_POD_REPO_UPDATE')
 
 cocoapods_version = (ENV["AC_COCOAPODS_VERSION"] != nil && ENV["AC_COCOAPODS_VERSION"] !="") ? ENV["AC_COCOAPODS_VERSION"] : nil
 
 project_dir_path = repository_path ? (Pathname.new repository_path).join(File.dirname(project_path)) : File.dirname(project_path)
 cocoapods_podfile_path = File.join(project_dir_path,"Podfile")
 cocoapods_podfilelock_path = File.join(project_dir_path,"Podfile.lock")
-# cocoapods_project_path = File.join(project_dir_path,"Pods","Pods.xcodeproj")
+cocoapods_project_path = File.join(project_dir_path,"Pods","Pods.xcodeproj")
 
 unless File.exist?(cocoapods_podfile_path)
     puts "Podfile does not exists."
@@ -21,10 +27,12 @@ if File.extname(project_path) != ".xcworkspace"
     exit 0
 end
 
-# if File.exist?(cocoapods_project_path)
-#     puts "Pods already installed."
-#     exit 0
-# end
+if pod_exist
+  if File.exist?(cocoapods_project_path)
+      puts "Pods already installed."
+      exit 0
+  end
+end
 
 def runCommand(command)
     puts "@@[command] #{command}"
@@ -57,10 +65,14 @@ end
 
 unless cocoapods_version.nil?
   runCommand("pod _#{cocoapods_version}_ setup")
-  runCommand("pod _#{cocoapods_version}_ repo update")
+  if pod_repo_update
+    runCommand("pod _#{cocoapods_version}_ repo update")
+  end
 else
   runCommand("pod --version")
-  runCommand("pod repo update")
+  if pod_repo_update
+    runCommand("pod repo update")
+  end
 end
 
 Dir.chdir(project_dir_path) do

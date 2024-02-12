@@ -20,6 +20,22 @@ inputs:
   title: Cocoapods Version
   description: Specifies cocoapods version.
   helpText:
+- key: "AC_PODFILE_EXIST"
+  defaultValue: "false"
+  isRequired: false
+  editorType: select
+  title: Pod File Existing
+  description: If project repository has already Pods file. This step will not install dependencies again.
+  options: "true,false"
+  helpText:
+- key: "AC_REPO_UPDATE"
+  defaultValue: "false"
+  isRequired: false
+  editorType: select
+  title: Cocoapods Repo Update
+  description: This value will update the Cocoapods native repository. If any majr changes in Cocoapods, pod repo update will run if it is true.
+  options: "true,false"
+  helpText:
 outputs:
 processFilename: ruby
 processArguments: '%AC_STEP_TEMP%/main.rb'
