@@ -28,7 +28,7 @@ inputs:
   description: If project repository has already Pods file. This step will not install dependencies again.
   options: "true,false"
   helpText:
-- key: "AC_REPO_UPDATE"
+- key: "AC_POD_REPO_UPDATE"
   defaultValue: "false"
   isRequired: false
   editorType: select
