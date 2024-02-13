@@ -25,7 +25,7 @@ inputs:
   isRequired: false
   editorType: select
   options: "YES,NO"
-  title: Does Podfile Exist?
+  title: Does Pods Directory Exist?
   description: If project repository has already Pods file. This step will not install dependencies again.
   helpText:
 - key: "AC_POD_REPO_UPDATE"
