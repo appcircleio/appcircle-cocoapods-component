@@ -1,14 +1,14 @@
 require 'open3'
 require 'pathname'
 
-def env_has_key(key)
-  return (ENV[key] != nil && ENV[key] !="") ? ENV[key] : abort("Missing #{key}.")
-end
+# def env_has_key(key)
+#   return (ENV[key] != nil && ENV[key] !="") ? ENV[key] : abort("Missing #{key}.")
+# end
 
 project_path = ENV["AC_PROJECT_PATH"] || abort('Missing project path.')
 repository_path = ENV["AC_REPOSITORY_DIR"]
-pod_file_exist = env_has_key('AC_PODFILE_EXIST')
-pod_repo_update = env_has_key('AC_POD_REPO_UPDATE')
+pod_file_exist = ENV['AC_PODFILE_EXIST']
+pod_repo_update = ENV['AC_POD_REPO_UPDATE']
 
 cocoapods_version = (ENV["AC_COCOAPODS_VERSION"] != nil && ENV["AC_COCOAPODS_VERSION"] !="") ? ENV["AC_COCOAPODS_VERSION"] : nil
 
@@ -27,7 +27,7 @@ if File.extname(project_path) != ".xcworkspace"
     exit 0
 end
 
-if pod_file_exist
+if pod_file_exist 
   if File.exist?(cocoapods_project_path)
       puts "Pods already installed."
       exit 0
