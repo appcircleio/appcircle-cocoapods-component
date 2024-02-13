@@ -21,7 +21,7 @@ inputs:
   description: Specifies cocoapods version.
   helpText:
 - key: "AC_PODFILE_EXIST"
-  defaultValue: "No"
+  defaultValue: "NO"
   isRequired: false
   editorType: select
   options: "YES,NO"
