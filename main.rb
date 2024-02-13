@@ -31,6 +31,8 @@ if pod_file_exist == 'YES'
   if File.exist?(cocoapods_project_path)
       puts "Pods already installed."
       exit 0
+  else
+      puts "Pods does not exist. Pod install command is being executed"
   end
 end
 
