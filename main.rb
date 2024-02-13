@@ -7,8 +7,8 @@ end
 
 project_path = ENV["AC_PROJECT_PATH"] || abort('Missing project path.')
 repository_path = ENV["AC_REPOSITORY_DIR"]
-pod_file_exist = env_has_key('AC_PODFILE_EXIST')
-pod_repo_update = env_has_key('AC_POD_REPO_UPDATE')
+pod_file_exist = (ENV['AC_PODFILE_EXIST'] != nil && ENV['AC_PODFILE_EXIST'] !="") ? ENV['AC_PODFILE_EXIST'] : 'NO'
+pod_repo_update = (ENV['AC_POD_REPO_UPDATE'] != nil && ENV['AC_POD_REPO_UPDATE'] !="") ? ENV['AC_POD_REPO_UPDATE'] : 'Unrequired'
 
 cocoapods_version = (ENV["AC_COCOAPODS_VERSION"] != nil && ENV["AC_COCOAPODS_VERSION"] !="") ? ENV["AC_COCOAPODS_VERSION"] : nil
 
@@ -27,7 +27,7 @@ if File.extname(project_path) != ".xcworkspace"
     exit 0
 end
 
-if pod_file_exist == 'true'
+if pod_file_exist == 'YES'
   if File.exist?(cocoapods_project_path)
       puts "Pods already installed."
       exit 0
@@ -65,12 +65,12 @@ end
 
 unless cocoapods_version.nil?
   runCommand("pod _#{cocoapods_version}_ setup")
-  if pod_repo_update == 'true'
+  if pod_repo_update == 'Required'
     runCommand("pod _#{cocoapods_version}_ repo update")
   end
 else
   runCommand("pod --version")
-  if pod_repo_update == 'true'
+  if pod_repo_update == 'Required'
     runCommand("pod repo update")
   end
 end
