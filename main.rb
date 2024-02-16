@@ -7,15 +7,15 @@ end
 
 project_path = ENV["AC_PROJECT_PATH"] || abort('Missing project path.')
 repository_path = ENV["AC_REPOSITORY_DIR"]
-pod_file_exist = (ENV['AC_PODFILE_EXIST'] != nil && ENV['AC_PODFILE_EXIST'] !="") ? ENV['AC_PODFILE_EXIST'] : 'NO'
-pod_repo_update = (ENV['AC_POD_REPO_UPDATE'] != nil && ENV['AC_POD_REPO_UPDATE'] !="") ? ENV['AC_POD_REPO_UPDATE'] : 'Unrequired'
+podfilelock_version = (ENV["AC_PODLOCK_VERSION"] != nil && ENV["AC_PODLOCK_VERSION"] !="") ? ENV["AC_PODLOCK_VERSION"] : 'Yes'
+pod_repo_update = (ENV['AC_POD_REPO_UPDATE'] != nil && ENV['AC_POD_REPO_UPDATE'] !="") ? ENV['AC_POD_REPO_UPDATE'] : 'No'
 
 cocoapods_version = (ENV["AC_COCOAPODS_VERSION"] != nil && ENV["AC_COCOAPODS_VERSION"] !="") ? ENV["AC_COCOAPODS_VERSION"] : nil
 
 project_dir_path = repository_path ? (Pathname.new repository_path).join(File.dirname(project_path)) : File.dirname(project_path)
 cocoapods_podfile_path = File.join(project_dir_path,"Podfile")
 cocoapods_podfilelock_path = File.join(project_dir_path,"Podfile.lock")
-cocoapods_project_path = File.join(project_dir_path,"Pods","Pods.xcodeproj")
+#cocoapods_project_path = File.join(project_dir_path,"Pods","Pods.xcodeproj")
 
 unless File.exist?(cocoapods_podfile_path)
     puts "Podfile does not exists."
@@ -27,14 +27,14 @@ if File.extname(project_path) != ".xcworkspace"
     exit 0
 end
 
-if pod_file_exist == 'YES'
-  if File.exist?(cocoapods_project_path)
-      puts "Pods already installed."
-      exit 0
-  else
-      puts "Pods does not exist. Pod install command is being executed"
-  end
-end
+
+# if File.exist?(cocoapods_project_path)
+#     puts "Pods already installed."
+#     exit 0
+# else
+#     puts "Pods does not exist. Pod install command is being executed"
+# end
+
 
 def runCommand(command)
     puts "@@[command] #{command}"
@@ -43,47 +43,57 @@ def runCommand(command)
     end
 end
 
-if cocoapods_version.nil?
+def podInstall(cocoapods_version, project_dir_path, pod_repo_update)
+  cocoapods_cmd_prefix = cocoapods_version ? "pod _#{cocoapods_version}_" : "pod"
+
+  runCommand("#{cocoapods_cmd_prefix} setup") unless cocoapods_version.nil?
+  runCommand("#{cocoapods_cmd_prefix} repo update") if pod_repo_update == 'Yes'
+
+  Dir.chdir(project_dir_path) do
+    runCommand("#{cocoapods_cmd_prefix} install")
+  end
+end
+
+if podfilelock_version == 'Yes'
+  puts "Using Podfile.lock Cocoapods Version"
   if File.exist?(cocoapods_podfilelock_path)
     versionArray = File.read(cocoapods_podfilelock_path).scan(/(?<=COCOAPODS: )(.*)/)[0]
     if versionArray && versionArray[0]
       cocoapods_version = versionArray[0]
       puts "Podfile.lock version = #{cocoapods_version}"
-      if `which rbenv`.empty?
-        runCommand("sudo gem install cocoapods -v #{cocoapods_version} --no-document")
+      system_cocoapods_version, stderr, status = Open3.capture3('pod --version') 
+      if cocoapods_version == system_cocoapods_version
+        podInstall(cocoapods_version, project_dir_path, pod_repo_update)
       else
-        runCommand("gem install cocoapods -v #{cocoapods_version} --no-document")
+        if `which rbenv`.empty?
+          runCommand("sudo gem install cocoapods -v #{cocoapods_version} --no-document")
+          podInstall(cocoapods_version, project_dir_path, pod_repo_update)
+        else
+          runCommand("gem install cocoapods -v #{cocoapods_version} --no-document")
+          podInstall(cocoapods_version, project_dir_path, pod_repo_update)
+        end
       end
     end
   end
 else
-  puts "Cocoapods version = #{cocoapods_version}"
-  if `which rbenv`.empty?
-    runCommand("sudo gem install cocoapods -v #{cocoapods_version} --no-document")
-  else
-    runCommand("gem install cocoapods -v #{cocoapods_version} --no-document")
-  end
-end
-
-unless cocoapods_version.nil?
-  runCommand("pod _#{cocoapods_version}_ setup")
-  if pod_repo_update == 'Required'
-    runCommand("pod _#{cocoapods_version}_ repo update")
-  end
-else
-  runCommand("pod --version")
-  if pod_repo_update == 'Required'
-    runCommand("pod repo update")
-  end
-end
-
-Dir.chdir(project_dir_path) do
-    command = "pod"
-    unless cocoapods_version.nil?
-      command += " _#{cocoapods_version}_"
+  unless cocoapods_version.nil?
+    puts "Cocoapods version = #{cocoapods_version}"
+    system_cocoapods_version, stderr, status = Open3.capture3('pod --version')
+    if cocoapods_version == system_cocoapods_version
+        puts "Using System Default Cocoapods Version"
+        podInstall(cocoapods_version, project_dir_path, pod_repo_update)
+    else
+        if `which rbenv`.empty?
+          runCommand("sudo gem install cocoapods -v #{cocoapods_version} --no-document")
+          podInstall(cocoapods_version, project_dir_path, pod_repo_update)
+        else
+          runCommand("gem install cocoapods -v #{cocoapods_version} --no-document")
+          podInstall(cocoapods_version, project_dir_path, pod_repo_update)
+        end
     end
-    command += " install"
-    runCommand(command)
+  else
+    puts "Using System Default Cocoapods Version"
+    podInstall(cocoapods_version, project_dir_path, pod_repo_update)
+  end
 end
-
 exit 0
