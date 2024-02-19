@@ -7,8 +7,6 @@ end
 
 project_path = ENV["AC_PROJECT_PATH"] || abort('Missing project path.')
 repository_path = ENV["AC_REPOSITORY_DIR"]
-podfilelock_version = (ENV["AC_PODLOCK_VERSION"] != nil && ENV["AC_PODLOCK_VERSION"] !="") ? ENV["AC_PODLOCK_VERSION"] : 'Yes'
-pod_repo_update = (ENV['AC_POD_REPO_UPDATE'] != nil && ENV['AC_POD_REPO_UPDATE'] !="") ? ENV['AC_POD_REPO_UPDATE'] : 'No'
 
 cocoapods_version = (ENV["AC_COCOAPODS_VERSION"] != nil && ENV["AC_COCOAPODS_VERSION"] !="") ? ENV["AC_COCOAPODS_VERSION"] : nil
 
@@ -46,15 +44,12 @@ end
 def podInstall(cocoapods_version, project_dir_path, pod_repo_update)
   cocoapods_cmd_prefix = cocoapods_version ? "pod _#{cocoapods_version}_" : "pod"
 
-  runCommand("#{cocoapods_cmd_prefix} setup") unless cocoapods_version.nil?
-  runCommand("#{cocoapods_cmd_prefix} repo update") if pod_repo_update == 'Yes'
-
   Dir.chdir(project_dir_path) do
     runCommand("#{cocoapods_cmd_prefix} install")
   end
 end
 
-if podfilelock_version == 'Yes'
+if cocoapods_version.nil?
   puts "Using Podfile.lock Cocoapods Version"
   if File.exist?(cocoapods_podfilelock_path)
     versionArray = File.read(cocoapods_podfilelock_path).scan(/(?<=COCOAPODS: )(.*)/)[0]
@@ -81,6 +76,8 @@ else
     system_cocoapods_version, stderr, status = Open3.capture3('pod --version')
     if cocoapods_version == system_cocoapods_version
         puts "Using System Default Cocoapods Version"
+        runCommand("pod _#{cocoapods_version}_ setup")
+        runCommand("pod _#{cocoapods_version}_ repo update")
         podInstall(cocoapods_version, project_dir_path, pod_repo_update)
     else
         if `which rbenv`.empty?

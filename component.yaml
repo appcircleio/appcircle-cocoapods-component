@@ -20,22 +20,6 @@ inputs:
   title: Cocoapods Version
   description: Specifies cocoapods version.
   helpText:
-- key: "AC_PODLOCK_VERSION"
-  defaultValue: "Yes"
-  isRequired: false
-  editorType: select
-  options: "Yes,No"
-  title: Use Podfile.lock Pod Version
-  description: If it selected 'Yes', this step uses your Podfile.lock cocoapods version. If it selected 'No', it uses the system default cocoapods version.
-  helpText:
-- key: "AC_POD_REPO_UPDATE"
-  defaultValue: "No"
-  isRequired: false
-  editorType: select
-  options: "Yes,No"
-  title: Is Cocoapods Repo Update Required?
-  description: This value will update the Cocoapods native repository. If any major changes in Cocoapods, pod repo update will run if it is true.
-  helpText:
 outputs:
 processFilename: ruby
 processArguments: '%AC_STEP_TEMP%/main.rb'
