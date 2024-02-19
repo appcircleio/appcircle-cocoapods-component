@@ -73,9 +73,7 @@ if cocoapods_version.nil?
       end
     end
   end
-end
-  
-unless cocoapods_version.nil?
+else
     puts "Cocoapods version = #{cocoapods_version}"
     system_cocoapods_version, stderr, status = Open3.capture3('pod --version')
     if cocoapods_version == system_cocoapods_version.strip
@@ -93,9 +91,5 @@ unless cocoapods_version.nil?
           podInstall(cocoapods_version, project_dir_path)
         end
     end
-  else
-    puts "Using System Default Cocoapods Version"
-    runCommand("pod _#{cocoapods_version}_ repo update")
-    podInstall(cocoapods_version, project_dir_path)
 end
 exit 0
