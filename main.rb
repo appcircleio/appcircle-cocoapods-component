@@ -52,6 +52,7 @@ end
 if cocoapods_version.nil?
   puts "Using System Default pod version."
   runCommand('pod --version')
+  runCommand("pod repo update")
   Dir.chdir(project_dir_path) do
     runCommand("pod install")
   end
