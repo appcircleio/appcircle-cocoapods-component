@@ -1,9 +1,7 @@
 require 'open3'
 require 'pathname'
 
-def env_has_key(key)
-  return (ENV[key] != nil && ENV[key] !="") ? ENV[key] : abort("Missing #{key}.")
-end
+
 
 project_path = ENV["AC_PROJECT_PATH"] || abort('Missing project path.')
 repository_path = ENV["AC_REPOSITORY_DIR"]
@@ -67,6 +65,5 @@ else
           runCommand("pod _#{cocoapods_version}_ setup")
           podInstall(cocoapods_version, project_dir_path)
         end
-    end
 end
 exit 0
