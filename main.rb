@@ -45,11 +45,7 @@ if cocoapods_version.nil?
   end
 else
   puts "Cocoapods version = #{cocoapods_version}"
-  if `which rbenv`.empty?
-    runCommand("sudo gem install cocoapods -v #{cocoapods_version} --no-document")
-  else
-    runCommand("gem install cocoapods -v #{cocoapods_version} --no-document")
-  end
+  runCommand("gem install cocoapods -v #{cocoapods_version} --no-document")
   runCommand("pod _#{cocoapods_version}_ setup")
   podInstall(cocoapods_version, project_dir_path)
 end
